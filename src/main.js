@@ -25,7 +25,7 @@ function toogleLoader(show) {
   loader.style.display = show ? 'block' : 'none';
 }
 
-function loadButton(show) {
+function moreButton(show) {
   loadMoreButton.style.display = show ? 'block' : 'none';
 }
 
