@@ -1,4 +1,9 @@
 export function addImage(image) {
+  image.downloads = undefined;
+  image.views = undefined;
+  image.likes = undefined;
+  image.largeImageURL = undefined;
+  image.webformatURL = undefined;
   const galleryElement = document.querySelector(".gallery");
   const html = `
     <li class="gallery-item">
