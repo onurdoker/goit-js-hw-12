@@ -1,20 +1,20 @@
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
 
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
-import { searchImages } from './js/pixabay-api.js';
-import { addImage } from './js/getImage-api.js';
+import { searchImages } from "./js/pixabay-api.js";
+import { addImage } from "./js/getImage-api.js";
 
-const loader = document.querySelector('.loader');
-const form = document.getElementById('searchForm');
-const galleryElement = document.querySelector('.gallery');
-const loadMoreButton = document.querySelector('.load-more');
-const endMessage = 'We\'re sorry, but you\'ve reached the end of search results';
+const loader = document.querySelector(".loader");
+const form = document.getElementById("searchForm");
+const galleryElement = document.querySelector(".gallery");
+const loadMoreButton = document.querySelector(".load-more");
+const endMessage = "We're sorry, but you've reached the end of search results";
 
 let currentPage = 1;
-let searchQuery = '';
+let searchQuery = "";
 let totalHits = 0;
 let cardHeight = 0;
 let lightbox;
@@ -23,22 +23,21 @@ function toggleLoader(display) {
   loader.style.display = display;
 }
 
-loader.style.display = 'none';
-form.addEventListener('submit', search);
+loader.style.display = "none";
+form.addEventListener("submit", search);
 
 function moreButton(show) {
-  loadMoreButton.style.display = show ? 'block' : 'none';
+  loadMoreButton.style.display = show ? "block" : "none";
 }
 
-form.addEventListener('submit', async e => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  searchQuery = document.getElementById('searchInput').value.trim();
+  searchQuery = document.getElementById("searchInput").value.trim();
 
-  if (searchQuery === '') {
+  if (searchQuery === "") {
     iziToast.warning({
-      title: 'Caution',
-      message: 'Please enter a search query.',
+      title: "Caution", message: "Please enter a search query.",
     });
     return;
   }
@@ -48,7 +47,7 @@ form.addEventListener('submit', async e => {
   await performSearch();
 });
 
-loadMoreButton.addEventListener('click', async () => {
+loadMoreButton.addEventListener("click", async () => {
   currentPage++;
   toggleLoader(true);
   await performSearch();
@@ -58,13 +57,12 @@ loadMoreButton.addEventListener('click', async () => {
 function smoothScroll() {
   if (currentPage > 1) {
     if (cardHeight === 0) {
-      const firstCard = document.querySelector('.gallery-item');
+      const firstCard = document.querySelector(".gallery-item");
       const rect = firstCard.getBoundingClientRect();
       cardHeight = rect.height;
     }
     window.scrollBy({
-      top: cardHeight * 4,
-      behavior: 'smooth',
+      top: cardHeight * 4, behavior: "smooth",
     });
   }
 }
@@ -74,16 +72,15 @@ async function performSearch() {
     const { hits, total } = await searchImages(searchQuery, currentPage);
     if (hits.length === 0) {
       iziToast.warning({
-        title: 'Caution',
-        message: 'Sorry, there are no more images matching your search query.',
+        title: "Caution", message: "Sorry, there are no more images matching your search query.",
       });
 
-      galleryElement.innerHTML = '';
+      galleryElement.innerHTML = "";
 
       moreButton(false);
     } else {
       if (currentPage === 1) {
-        galleryElement.innerHTML = '';
+        galleryElement.innerHTML = "";
         totalHits = total;
 
         moreButton(false);
@@ -92,7 +89,7 @@ async function performSearch() {
         addImage(image);
       });
 
-      if (galleryElement.querySelectorAll('.gallery-item').length < totalHits) {
+      if (galleryElement.querySelectorAll(".gallery-item").length < totalHits) {
 
         moreButton(true);
       } else {
@@ -101,17 +98,15 @@ async function performSearch() {
         iziToast.info({ message: endMessage });
       }
       if (!lightbox) {
-        lightbox = new SimpleLightbox('.gallery-link', {
-          captions: true,
-          captionsData: 'alt',
-          captionDelay: 250,
+        lightbox = new SimpleLightbox(".gallery-link", {
+          captions: true, captionsData: "alt", captionDelay: 250,
         });
       } else {
         lightbox.refresh();
       }
     }
   } catch (error) {
-    console.error('Error', error);
+    console.error("Error", error);
   } finally {
     toggleLoader(false);
   }
