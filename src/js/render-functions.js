@@ -1,9 +1,9 @@
-import iziToast from 'izitoast';
-import SimpleLightbox from 'simplelightbox';
+import iziToast from "izitoast";
+import SimpleLightbox from "simplelightbox";
 
-import 'izitoast/dist/css/iziToast.min.css';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import '../css/msg-styles.css';
+import "izitoast/dist/css/iziToast.min.css";
+import "simplelightbox/dist/simple-lightbox.min.css";
+import "../css/styles.css";
 
 export default class Render {
   #selectorGallery;
@@ -13,16 +13,16 @@ export default class Render {
   #HIDDEN_CLASS;
 
   constructor(
-    selectorGallery = '.gallery',
-    selectorLoadingMsg = '.loader-section',
-    selectorLoadButton = 'button[type="button"]'
+    selectorGallery = ".gallery",
+    selectorLoadingMsg = ".loader-section",
+    selectorLoadButton = "button[type=\"button\"]",
   ) {
     this.#selectorLoadingMsg = selectorLoadingMsg;
     this.#lightbox = new SimpleLightbox(
-      `${(this.#selectorGallery = selectorGallery)} a`
+      `${(this.#selectorGallery = selectorGallery)} a`,
     );
     this.#selectorLoadButton = selectorLoadButton;
-    this.#HIDDEN_CLASS = 'visually-hidden';
+    this.#HIDDEN_CLASS = "visually-hidden";
   }
 
   showGalery(objData, page, per_page) {
@@ -30,7 +30,7 @@ export default class Render {
     const loadButton = document.querySelector(this.#selectorLoadButton);
 
     if (page === 1) {
-      gallery.innerHTML = '';
+      gallery.innerHTML = "";
     }
 
     if (!objData || !objData.total) {
@@ -82,24 +82,25 @@ export default class Render {
             </ul>
           </li>`
       );
-    }, '');
+    }, "");
     loadButton.classList.remove(this.#HIDDEN_CLASS);
     this.#lightbox.refresh();
 
     if (objData.total - (page - 1) * per_page <= per_page) {
       this.showErrorMsg(
-        "We're sorry, but you've reached the end of search results."
+        "We're sorry, but you've reached the end of search results.",
       );
       loadButton.classList.add(this.#HIDDEN_CLASS);
     }
   }
 
-  scrollGallery() {0
-    const img = document.querySelector('li>a>img');
+  scrollGallery() {
+    0;
+    const img = document.querySelector("li>a>img");
     const rect = img.getBoundingClientRect();
     scrollBy({
       top: rect.height * 2,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }
 
@@ -110,29 +111,29 @@ export default class Render {
   }
 
   showErrorMsg(
-    msg = 'Sorry, there are no images matching your search query. Please, try again!'
+    msg = "Sorry, there are no images matching your search query. Please, try again!",
   ) {
     iziToast.show({
-      class: 'error-msg',
+      class: "error-msg",
       message: msg,
-      messageColor: '#FAFAFB',
-      messageSize: '16',
-      messageLineHeight: '24',
-      theme: 'dark',
-      color: '#EF4040',
-      iconText: 'Close',
-      iconColor: '#FAFAFB',
+      messageColor: "#FAFAFB",
+      messageSize: "16",
+      messageLineHeight: "24",
+      theme: "dark",
+      color: "#EF4040",
+      iconText: "Close",
+      iconColor: "#FAFAFB",
       // iconUrl: 'img/button-x.svg',
-      maxWidth: '432',
+      maxWidth: "432",
       zindex: 999,
       close: true,
       closeOnEscape: true,
       displayMode: 2,
-      position: 'topRight',
+      position: "topRight",
       timeout: 5000,
       animateInside: false,
       drag: false,
-      progressBarColor: '#B51B1B',
+      progressBarColor: "#B51B1B",
     });
   }
 }
