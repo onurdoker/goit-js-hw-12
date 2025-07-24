@@ -1,116 +1,61 @@
-import iziToast from "izitoast";
-import "izitoast/dist/css/iziToast.min.css";
+import * as api from './js/pixabay-api';
+import * as render from './js/render-functions';
 
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+const searchForm = document.querySelector('.search-form');
+const loader = document.querySelector('.loader-placeholder');
+const loadMore = document.querySelector('.load-more');
+let searchInputValue;
+const per_page = 40;
+let page = 1;
 
-import { searchImages } from "./js/pixabay-api.js";
-import { addImage } from "./js/getImage-api.js";
-
-const loader = document.querySelector(".loader");
-const form = document.getElementById("searchForm");
-const galleryElement = document.querySelector(".gallery");
-const loadMoreButton = document.querySelector(".load-more");
-const endMessage = "We're sorry, but you've reached the end of search results";
-
-let currentPage = 1;
-let searchQuery = "";
-let totalHits = 0;
-let cardHeight = 0;
-let lightbox;
-
-
-function toggleLoader(show) {
-  loader.style.display = show ? "block" : "none";
-}
-
-function moreButton(show) {
-  loadMoreButton.style.display = show ? "block" : "none";
-}
-
-form.addEventListener("submit", async e => {
-  e.preventDefault();
-
-  searchQuery = document.getElementById("searchInput").value.trim();
-
-  if (searchQuery === "") {
-    iziToast.warning({
-      title: "Caution",
-      message: "Please enter a search query.",
-    });
-    return;
-  }
-
-  currentPage = 1;
-  toggleLoader(true);
-  await performSearch();
-});
-
-loadMoreButton.addEventListener("click", async () => {
-  currentPage++;
-  toggleLoader(true);
-  await performSearch();
-  smoothScroll();
-});
-
-async function performSearch() {
+const loadPictures = async () => {
   try {
-    const { hits, total } = await searchImages(searchQuery, currentPage);
-    if (hits.length === 0) {
-      iziToast.warning({
-        title: "Caution",
-        message: "Sorry, there are no more images matching your search query.",
-      });
+    loader.classList.add('loader');
+    loadMore.classList.add('is-hidden');
+    const response = await api.searchImage(searchInputValue, page, per_page);
+    console.log(response);
 
-      galleryElement.innerHTML = "";
-
-      moreButton(false);
+    if (!response.data.hits.length) {
+      render.showError(
+        'Sorry, there are no images matching your search query. Please, try again!'
+      );
+      return;
+    }
+    render.showGallery(response.data.hits);
+    if (response.data.totalHits > page * per_page) {
+      loadMore.classList.remove('is-hidden');
     } else {
-      if (currentPage === 1) {
-        galleryElement.innerHTML = "";
-        totalHits = total;
-
-        moreButton(false);
-      }
-      hits.forEach(image => {
-        addImage(image);
-      });
-
-      if (galleryElement.querySelectorAll(".gallery-item").length < totalHits) {
-
-        moreButton(true);
-      } else {
-
-        moreButton(false);
-        iziToast.info({ message: endMessage });
-      }
-      if (!lightbox) {
-        lightbox = new SimpleLightbox(".gallery-link", {
-          captions: true,
-          captionsData: "alt",
-          captionDelay: 250,
-        });
-      } else {
-        lightbox.refresh();
-      }
+      render.showMessage(
+        "We're sorry, but you've reached the end of search results."
+      );
     }
   } catch (error) {
-    console.error("Error", error);
+    console.error('Error fetching images:', error);
   } finally {
-    toggleLoader(false);
+    loader.classList.remove('loader');
   }
-}
+};
 
-function smoothScroll() {
-  if (currentPage > 1) {
-    if (cardHeight === 0) {
-      const firstCard = document.querySelector(".gallery-item");
-      const rect = firstCard.getBoundingClientRect();
-      cardHeight = rect.height;
-    }
-    window.scrollBy({
-      top: cardHeight * 4,
-      behavior: "smooth",
-    });
+searchForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  searchInputValue = event.target.elements.input.value.trim();
+
+  if (!searchInputValue) {
+    return render.showError('Please fill out this field');
   }
-}
+  render.clearGallery();
+  page = 1;
+  loadPictures();
+});
+
+loadMore.addEventListener('click', async () => {
+  page++;
+  await loadPictures();
+  const galleryItemHeight = document
+    .querySelector('.gallery-item')
+    .getBoundingClientRect().height;
+  window.scrollBy({
+    top: galleryItemHeight * 2,
+    behavior: 'smooth',
+  });
+});
