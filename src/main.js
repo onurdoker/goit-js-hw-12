@@ -19,12 +19,10 @@ let totalHits = 0;
 let cardHeight = 0;
 let lightbox;
 
-function toggleLoader(display) {
-  loader.style.display = display;
-}
 
-loader.style.display = "none";
-form.addEventListener("submit", search);
+function toggleLoader(show) {
+  loader.style.display = show ? "block" : "none";
+}
 
 function moreButton(show) {
   loadMoreButton.style.display = show ? "block" : "none";
@@ -37,7 +35,8 @@ form.addEventListener("submit", async e => {
 
   if (searchQuery === "") {
     iziToast.warning({
-      title: "Caution", message: "Please enter a search query.",
+      title: "Caution",
+      message: "Please enter a search query.",
     });
     return;
   }
@@ -54,25 +53,13 @@ loadMoreButton.addEventListener("click", async () => {
   smoothScroll();
 });
 
-function smoothScroll() {
-  if (currentPage > 1) {
-    if (cardHeight === 0) {
-      const firstCard = document.querySelector(".gallery-item");
-      const rect = firstCard.getBoundingClientRect();
-      cardHeight = rect.height;
-    }
-    window.scrollBy({
-      top: cardHeight * 4, behavior: "smooth",
-    });
-  }
-}
-
 async function performSearch() {
   try {
     const { hits, total } = await searchImages(searchQuery, currentPage);
     if (hits.length === 0) {
       iziToast.warning({
-        title: "Caution", message: "Sorry, there are no more images matching your search query.",
+        title: "Caution",
+        message: "Sorry, there are no more images matching your search query.",
       });
 
       galleryElement.innerHTML = "";
@@ -99,7 +86,9 @@ async function performSearch() {
       }
       if (!lightbox) {
         lightbox = new SimpleLightbox(".gallery-link", {
-          captions: true, captionsData: "alt", captionDelay: 250,
+          captions: true,
+          captionsData: "alt",
+          captionDelay: 250,
         });
       } else {
         lightbox.refresh();
@@ -109,5 +98,19 @@ async function performSearch() {
     console.error("Error", error);
   } finally {
     toggleLoader(false);
+  }
+}
+
+function smoothScroll() {
+  if (currentPage > 1) {
+    if (cardHeight === 0) {
+      const firstCard = document.querySelector(".gallery-item");
+      const rect = firstCard.getBoundingClientRect();
+      cardHeight = rect.height;
+    }
+    window.scrollBy({
+      top: cardHeight * 4,
+      behavior: "smooth",
+    });
   }
 }
